@@ -1,0 +1,15 @@
+{
+  "name": "web-scraper",
+  "version": "0.0.1",
+  "description": "simple web scraper to scrape books info from amazon",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "Wang Tianqi",
+  "dependencies": {
+    "cheerio": "latest",
+    "express": "latest",
+    "request": "latest"
+  }
+}
