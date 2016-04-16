@@ -1,0 +1,8 @@
+{
+  "couch": {
+    "host": "localhost",
+    "protocol": "http",
+    "port": 5984,
+    "database": "books"
+  }
+}
