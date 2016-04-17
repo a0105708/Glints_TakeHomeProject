@@ -117,7 +117,6 @@ var BookPage = React.createClass({displayName: "BookPage",
 		    if($(this).attr('href') === '#'){
 		    	$("#modalDanger1").modal("show");
 		    }
-		    // or alert($(this).hash();
 		  });
 		});
 
@@ -158,6 +157,7 @@ var BookPage = React.createClass({displayName: "BookPage",
 				                React.createElement("h4", null, React.createElement("a", {href: "#"}, this.state.book.title)
 				                ), 
 				                React.createElement("h5", null, "Author: ", this.state.book.author), 
+				                React.createElement("h5", null, "ISBN-10: ", this.state.book._id), 
 				                React.createElement("p", null, "See more information from Amazon ", React.createElement("strong", null, React.createElement("a", {target: "_blank", href: this.state.book.link}, " Amazon - ", this.state.book.title))), 
 				                 React.createElement("h5", null, "Book Description: "), 
 				                React.createElement("div", {id: "bookDescription"}, " ")

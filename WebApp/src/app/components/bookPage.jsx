@@ -106,7 +106,6 @@ var BookPage = React.createClass({
 		    if($(this).attr('href') === '#'){
 		    	$("#modalDanger1").modal("show");
 		    }
-		    // or alert($(this).hash();
 		  });
 		});
 
@@ -147,6 +146,7 @@ var BookPage = React.createClass({
 				                <h4><a href="#">{this.state.book.title}</a>
 				                </h4>
 				                <h5>Author: {this.state.book.author}</h5>
+				                <h5>ISBN-10: {this.state.book._id}</h5>
 				                <p>See more information from Amazon <strong><a target="_blank" href={this.state.book.link}> Amazon - {this.state.book.title}</a></strong></p>
 				                 <h5>Book Description: </h5>
 				                <div id="bookDescription"> </div>
