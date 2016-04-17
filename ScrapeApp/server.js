@@ -13,7 +13,7 @@ var app = express();
 
 app.get('/scrape', function(req, res){
 
-    var keyword = 'javascript';
+    var keyword = 'couchdb';
     var url = 'http://www.amazon.com/s/?field-keywords='+keyword+'&page=1';
 
     //get the first page of search results on amazon based on skill
@@ -25,12 +25,14 @@ app.get('/scrape', function(req, res){
                 if(err){
                     console.log(err);
                 }else{
-                    console.log('File successfully written! - Check project directory for the amazon_XXX.html file');
+                    //save the search result for comparison 
+                    console.log('File successfully written! - Check project directory for the amazon_KEYWORD.html file');
                 }
             });
 
             var books = [];
             for(var i=0; i<16; i++){
+                //scrape book info
                 var id = $('#result_'+i).attr('data-asin');
                 var link = $('#result_'+i).children().children().children().children().first().children().children().children().first().attr('href');
                 var title = $('#result_'+i).children().children().children().children().last().children().first().next().children().first().children().first().text();
@@ -47,7 +49,7 @@ app.get('/scrape', function(req, res){
                     link: link,
                     title: title,
                     image: image,
-                    description: '',
+                    description: 'No book description',
                     author: author === '' ? $('#result_'+i).children().children().children().children().last().children().first().next().children().last().children().last().text() : author,
                     author_link: author_link ===  'http://www.amazon.comundefined' ? 'No author page' : author_link,
                     author_bio: 'No author bio info',
@@ -59,61 +61,86 @@ app.get('/scrape', function(req, res){
             console.log(books);
 
             if(books[0]._id === undefined){
+                //something is wrong, maybe Amazon limits the number of connection
+                //as a result, the html we get is not in the correct format, and the book info is not at the correct place in the page
                 console.log("Connection lost");
             }else{
+
                 for(var j=0; j<books.length; j++){
+                    //insert the book info into couchdb
                     books_DB.insert(books[j], function(insert_err, insert_body) {
                         if (!insert_err){
                             console.log("Book inserted into books DB: ", insert_body.id);
                             books_DB.get(insert_body.id, function(get_err, book_body) {
                                 if (!get_err) {
                                     var this_book=book_body;
-                                    if(this_book.author_link !== 'No author page'){
-                                        request(this_book.author_link, function(error1, response1, html1){
-                                            if(!error1){
-                                                var $author = cheerio.load(html1);
-                                                // fs.writeFile('amazon_'+this_book.author+'.html', $author.html(), function(err){
-                   
-                                                // });
-                                                // console.log($author('#ap-bio').children().first().children().first().children().first().html());
-                                                this_book.author_bio=$author('#ap-bio').children().first().children().first().children().first().html().trim();
-                                                if(this_book.author_bio === ''){
-                                                    this_book.author_bio = 'No author bio info'
-                                                }
+                                    //get book description using the book link
+                                    request(this_book.link, function(error1, response1, html1){
+                                        if(!error1){
 
-                                                books_DB.insert(this_book, function(update_err, update_body) {
-                                                    if(!update_err){
-                                                        console.log("Author Bio updated: ", update_body.id);
-                                                    }else{
-                                                        console.log(update_err);
-                                                    }
-                                                });
-                                                
-                                            }else{
-                                                console.log(error1);
-                                            }
-                                        });
-                                    }
-                                    //Not working due to iframe
-                                    // request(this_book.link, function(error1, response1, html1){
-                                    //     if(!error1){
-                                    //         var $book = cheerio.load(html1);
-                                    //         fs.writeFile('amazon_'+this_book._id+'.html', $book.html(), function(err){
+                                            var $book = cheerio.load(html1);
+                                            // fs.writeFile('amazon_'+this_book._id+'.html', $book.html(), function(err){
                
-                                    //         });
+                                            // });
+                                            var description= $book('#bookDescription_feature_div').children().first().next().html();
+                                            // console.log(description);
+                                            if(description === '' || description == null){
+                                                this_book.description = 'No book description';
+                                            }else{
+                                                this_book.description = description.trim();
+                                            }
 
-                                    //         // var $book = cheerio.load(html1);
-                                    //         // //console.log($.html());
-                                    //         var description= $book('#iframeContent').contents();
-                                    //         console.log(description);
-                                    //         // this_book.description=description;
-                                    //         // console.log(this_book);
-                                    //         //update DB
+                                            //update book db with book description 
+                                            books_DB.insert(this_book, function(update_err, update_body) {
+                                                if(!update_err){
+                                                    console.log("Book description updated: ", update_body.id);
+                                                    
+                                                    books_DB.get(update_body.id, function(get_err1, book_body1) {
+                                                        if (!get_err1) {
+                                                            var this_book1=book_body1;
 
-                                    //     }else{
-                                    //         console.log(error1);
-                                    //     }
-                                    // });
+                                                            if(this_book1.author_link !== 'No author page'){
+                                                                //get author bio using author link
+                                                                request(this_book1.author_link, function(error2, response2, html2){
+                                                                    if(!error2){
+                                                                        var $author = cheerio.load(html2);
+                                                                        // fs.writeFile('amazon_'+this_book.author+'.html', $author.html(), function(err){
+
+                                                                        // });
+                                                                        // console.log($author('#ap-bio').children().first().children().first().children().first().html());
+                                                                        this_book1.author_bio = $author('#ap-bio').children().first().children().first().children().first().html().trim();
+                                                                        if(this_book1.author_bio === ''){
+                                                                            this_book1.author_bio = 'No author bio info';
+                                                                        }
+
+                                                                        //update book db with author bio info
+                                                                        books_DB.insert(this_book1, function(update_err1, update_body1) {
+                                                                            if(!update_err1){
+                                                                                console.log("Author Bio updated: ", update_body1.id);
+                                                                            }else{
+                                                                                console.log(update_err1);
+                                                                            }
+                                                                        });
+                                                                        
+                                                                    }else{
+                                                                        console.log(error2);
+                                                                    }
+                                                                });
+                                                            }
+                                                        }else{
+                                                            console.log(get_err1);
+                                                        }
+                                                    });
+
+                                                }else{
+                                                    console.log(update_err);
+                                                }
+                                            });
+                                        
+                                        }else{
+                                            console.log(error1);
+                                        }
+                                    });
 
 
                                 }else{

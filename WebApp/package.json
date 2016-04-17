@@ -1,0 +1,46 @@
+{
+  "name": "web-app",
+  "version": "0.0.1",
+  "description": "simple web app to browse books by skill",
+  "scripts": {
+    "start": "gulp"
+  },
+  "author": "Wang Tianqi",
+  "browserify": {
+    "transform": [
+      [
+        "reactify",
+        {
+          "es6": true
+        }
+      ]
+    ]
+  },
+
+  "dependencies": {
+    "browser-sync": "latest",
+    "browserify": "latest",
+    "gulp-watch": "latest",
+    "pretty-hrtime": "latest",
+    "vinyl-source-stream": "latest",
+    "watchify": "latest",
+    "body-parser": "latest",
+    "cookie-parser": "latest",
+    "del": "latest",
+    "express": "latest",
+    "express-react-views": "latest",
+    "express-session": "latest",
+    "glob": "latest",
+    "gulp": "latest",
+    "gulp-nodemon": "latest",
+    "gulp-notify": "latest",
+    "gulp-util": "latest",
+    "nano": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "request": "latest",
+    "require": "latest",
+    "reactify": "latest"
+
+  }
+}

@@ -1,0 +1,27 @@
+html {
+  font-family: 'Lato', sans-serif;
+}
+
+body, h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+}
+
+a {
+	text-decoration: none;
+	color: #000000;
+}
+
+body {
+  font-size: 13px;
+  line-height: 20px;
+}
+.leaflet-google-layer{
+    z-index: 0 !important;
+}
+.leaflet-map-pane{
+    z-index: 100;
+}
+textarea {
+    resize: none;
+}
+
