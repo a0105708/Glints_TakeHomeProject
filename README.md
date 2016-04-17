@@ -3,10 +3,13 @@ Glints Take-home Project - Wang Tianqi
 
 
 DB Configuration:
+
 Please install couchDB first, and then create a database named 'books', next create a new design document with the code provided below:
 
+
 {
-   "_id": "_design/books",
+"_id": "_design/books",
+   
    "views": {
        
      	"by_id": {
@@ -32,17 +35,28 @@ Please install couchDB first, and then create a database named 'books', next cre
 
 DB schema is as follows:
 
+
 {
 	_id: (ISBN-10),
+	
 	skill: (skill, e.g. javascript, mysql, couchdb),
+	
 	link: (book url to amazon),
+	
 	title: (book title),
+	
 	image: (cover image url),
+	
 	description: (book description),
+	
 	author: (book author),
+	
 	author_link: (url to author page on amazon),
+	
 	author_bio: (description of the author),
+	
 	price: ($xx.xx),
+	
 	ratings: (customers' reviews on Amazon, e.g. 4.5 out of 5 stars)
 }
 
